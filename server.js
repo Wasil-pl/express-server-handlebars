@@ -20,16 +20,14 @@ app.get('/hello/:name', (req, res) => res.render('hello', { name: req.params.nam
 
 app.post('/contact/send-message', upload.single('file'), (req, res) => {
   const { author, sender, title, message } = req.body;
-  if (author && sender && title && message) {
-    if (req.file) {
-      const fileName = req.file.originalname;
-      res.render('contact', { isSent: true, fileName });
-    } else {
-      res.render('contact', { isFileError: true });
-    }
-  } else {
-    res.render('contact', { isError: true });
-  }
+
+  const hasMessageData = author && sender && title && message;
+  if (!hasMessageData) return res.render('contact', { isError: true });
+
+  const fileName = req.file?.originalname;
+  if (!fileName) return res.render('contact', { isFileError: true });
+
+  res.render('contact', { isSent: true, fileName });
 });
 
 app.use((req, res) => res.status(404).send('404 not found...'));
